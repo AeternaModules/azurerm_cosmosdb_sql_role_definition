@@ -19,7 +19,7 @@ EOT
     name                = string
     resource_group_name = string
     role_definition_id  = optional(string)
-    type                = optional(string, "CustomRole")
+    type                = optional(string) # Default: "CustomRole"
     permissions = object({
       data_actions = set(string)
     })
