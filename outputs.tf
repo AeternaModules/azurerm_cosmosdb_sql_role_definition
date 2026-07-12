@@ -1,3 +1,7 @@
+output "cosmosdb_sql_role_definitions_id" {
+  description = "Map of id values across all cosmosdb_sql_role_definitions, keyed the same as var.cosmosdb_sql_role_definitions"
+  value       = { for k, v in azurerm_cosmosdb_sql_role_definition.cosmosdb_sql_role_definitions : k => v.id }
+}
 output "cosmosdb_sql_role_definitions_account_name" {
   description = "Map of account_name values across all cosmosdb_sql_role_definitions, keyed the same as var.cosmosdb_sql_role_definitions"
   value       = { for k, v in azurerm_cosmosdb_sql_role_definition.cosmosdb_sql_role_definitions : k => v.account_name }
