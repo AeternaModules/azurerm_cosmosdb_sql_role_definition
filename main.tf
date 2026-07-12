@@ -8,8 +8,11 @@ resource "azurerm_cosmosdb_sql_role_definition" "cosmosdb_sql_role_definitions" 
   role_definition_id  = each.value.role_definition_id
   type                = each.value.type
 
-  permissions {
-    data_actions = each.value.permissions.data_actions
+  dynamic "permissions" {
+    for_each = each.value.permissions
+    content {
+      data_actions = permissions.value.data_actions
+    }
   }
 }
 

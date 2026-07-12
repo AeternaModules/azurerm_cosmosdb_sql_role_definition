@@ -20,46 +20,17 @@ EOT
     resource_group_name = string
     role_definition_id  = optional(string)
     type                = optional(string) # Default: "CustomRole"
-    permissions = object({
+    permissions = list(object({
       data_actions = set(string)
-    })
+    }))
   }))
-  validation {
-    condition = alltrue([
-      for k, v in var.cosmosdb_sql_role_definitions : (
-        v.role_definition_id == null || (can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", v.role_definition_id)))
-      )
-    ])
-    error_message = "must be a valid UUID"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.cosmosdb_sql_role_definitions : (
-        length(v.assignable_scopes) > 0
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.cosmosdb_sql_role_definitions : (
-        length(v.name) > 0
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.cosmosdb_sql_role_definitions : (
-        length(v.permissions.data_actions) > 0
-      )
-    ])
-    error_message = "must not be empty"
-  }
   # --- Unconfirmed validation candidates, derived from azurerm_cosmosdb_sql_role_definition's provider source ---
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
   # or a path that crosses a list-typed block (needs its own for_each wrapping).
   # Review, translate into a real validation{} block above, and delete once confirmed.
+  # path: role_definition_id
+  #   condition: can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", value))
+  #   message:   must be a valid UUID
   # path: resource_group_name
   #   condition: length(value) <= 90
   #   message:   [from resourcegroups.ValidateName: invalid when len(value) > 90]
@@ -78,5 +49,14 @@ EOT
   #   source:    [from validate.CosmosAccountName] !matched
   # path: type
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: assignable_scopes[*]
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: permissions.data_actions[*]
+  #   condition: length(value) > 0
+  #   message:   must not be empty
 }
 
