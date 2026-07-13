@@ -19,11 +19,19 @@ EOT
     name                = string
     resource_group_name = string
     role_definition_id  = optional(string)
-    type                = optional(string) # Default: "CustomRole"
+    type                = optional(string)
     permissions = list(object({
       data_actions = set(string)
     }))
   }))
+  validation {
+    condition = alltrue([
+      for k, v in var.cosmosdb_sql_role_definitions : (
+        length(v.permissions) >= 1
+      )
+    ])
+    error_message = "Each permissions list must contain at least 1 items"
+  }
   # --- Unconfirmed validation candidates, derived from azurerm_cosmosdb_sql_role_definition's provider source ---
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
   # or a path that crosses a list-typed block (needs its own for_each wrapping).
